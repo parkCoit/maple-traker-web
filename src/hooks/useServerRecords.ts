@@ -35,10 +35,11 @@ export function useServerRecords() {
       const data = await autoLoginAPI(token);
 
       // map server logs to ServerRecord
+      const manToRaw = (v: number | undefined | null) => (v ?? 0) * 10000;
       const mapped: ServerRecord[] = (data.farming || []).map((log: any) => ({
         date: log.date,
         materials: log.stuff ?? 0,
-        netMeso: log.meso_man ?? 0,
+        netMeso: log.meso ?? manToRaw(log.meso_man),
         fragments: log.frags ?? 0,
         fragmentPrice: log.f_price ?? 0,
         kojam: log.gems ?? 0,

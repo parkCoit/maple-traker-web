@@ -22,6 +22,8 @@ type ServerFarmingLog = {
   date: string;
   level?: number;
   exp_pct?: number;
+  meso?: number;
+  total?: number;
 
   meso_man: number;
   frags: number;
@@ -120,11 +122,11 @@ export function Farming() {
     return userData.farming.map((log) => ({
       date: log.date,
       stuff: log.stuff,
-        // convert server 'man' units to raw meso
-        meso: (log.meso_man ?? log.meso ?? 0) * 10000,
+      // convert server 'man' units to raw meso
+      meso: (log.meso_man ?? log.meso ?? 0) * 10000,
       frags: log.frags,
       gems: log.gems,
-        total: (log.total_meso ?? log.total ?? 0) * 10000,
+      total: (log.total_meso ?? log.total ?? 0) * 10000,
     }));
   }, [userData]);
 

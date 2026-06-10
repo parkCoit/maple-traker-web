@@ -1,25 +1,15 @@
 import { useState, useMemo } from "react";
 import { useServerRecords } from "@/hooks/useServerRecords";
 import type { ServerRecord as HuntRecord } from "@/hooks/useServerRecords";
+import { formatKoreanCurrency } from "@/utils/format";
+
 function getTotalMeso(record: HuntRecord): number {
+  // record.netMeso, fragmentPrice, kojamPrice are stored in raw meso units
   return (
-    record.netMeso * 10000 +
-    record.fragments * record.fragmentPrice +
-    record.kojam * record.kojamPrice
+    (record.netMeso ?? 0) +
+    (record.fragments ?? 0) * (record.fragmentPrice ?? 0) +
+    (record.kojam ?? 0) * (record.kojamPrice ?? 0)
   );
-}
-function formatKoreanAmount(value: number): string {
-  if (value >= 100000000) {
-    const eok = Math.floor(value / 100000000);
-    const man = Math.floor((value % 100000000) / 10000);
-    if (man > 0) return `${eok}억${man}만원`;
-    return `${eok}억`;
-  }
-  if (value >= 10000) {
-    const man = Math.floor(value / 10000);
-    return `${man}만원`;
-  }
-  return `${value}메소`;
 }
 function getWeekRange(
   year: number,
@@ -73,7 +63,7 @@ export default function WeeklyChart() {
       const dayRecords = records.filter((r) => r.date === dateStr);
       const total = dayRecords.reduce((acc, r) => acc + getTotalMeso(r), 0);
       const materials = dayRecords.reduce((acc, r) => acc + r.materials, 0);
-      const netMeso = dayRecords.reduce((acc, r) => acc + r.netMeso * 10000, 0);
+      const netMeso = dayRecords.reduce((acc, r) => acc + (r.netMeso ?? 0), 0);
       const fragments = dayRecords.reduce((acc, r) => acc + r.fragments, 0);
       const huntingTime = dayRecords.reduce(
         (acc, r) => acc + r.huntingHours * 60 + r.huntingMinutes,
@@ -248,7 +238,7 @@ export default function WeeklyChart() {
             style={{ bottom: `${48 + ratio * BAR_MAX_PX}px` }}
           >
             <span className="absolute right-0 -top-3 text-[9px] text-[#3a3a5a]">
-              {formatKoreanAmount(maxVal * ratio)}
+              {formatKoreanCurrency(Math.round(maxVal * ratio))}
             </span>
           </div>
         ))}
@@ -270,10 +260,10 @@ export default function WeeklyChart() {
               >
                 <div className="flex-1 flex items-end justify-center pb-1">
                   {d.total > 0 && (
-                    <span
-                      className={`text-[9px] font-medium leading-none ${isToday ? "text-[#c8a84b]" : "text-[#5a5a7a]"}`}
-                    >
-                      {formatKoreanAmount(d.total)}
+                        <span
+                          className={`text-[9px] font-medium leading-none ${isToday ? "text-[#c8a84b]" : "text-[#5a5a7a]"}`}
+                        >
+                          {formatKoreanCurrency(d.total)}
                     </span>
                   )}
                 </div>
@@ -319,7 +309,7 @@ export default function WeeklyChart() {
             label: "총 메소",
             value:
               weekStats.totalMeso > 0
-                ? formatKoreanAmount(weekStats.totalMeso)
+                ? formatKoreanCurrency(weekStats.totalMeso)
                 : "—",
           },
           {
@@ -332,7 +322,7 @@ export default function WeeklyChart() {
             label: "소재당 평균 메소",
             value:
               weekStats.totalMaterials > 0
-                ? formatKoreanAmount(weekStats.avgMesoPerMat)
+                ? formatKoreanCurrency(weekStats.avgMesoPerMat)
                 : "—",
           },
           {

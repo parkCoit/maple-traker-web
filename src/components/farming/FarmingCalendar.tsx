@@ -1,4 +1,5 @@
 import type { DisplayFarmingLog } from "@/types/farming";
+import { formatKoreanCurrency } from "@/utils/format";
 type CalendarDay = {
   date: Date;
   log?: DisplayFarmingLog;
@@ -11,16 +12,6 @@ type Props = {
   calendarDays: CalendarDay[];
   startOffset: number;
 };
-function formatKoreanAmount(value: number): string {
-  // value는 실제 메소 단위(정수)라고 가정
-  if (value >= 10000) {
-    const eok = Math.floor(value / 10000);
-    const man = Math.floor(value % 10000);
-    if (man > 0) return `${eok}억${man}만원`;
-    return `${eok}억`;
-  }
-  return `${value}만원`;
-}
 function getTier(stuff: number) {
   // 티어 기준을 '소재(stuff)' 기준으로 변경
   if (stuff >= 10)
@@ -98,7 +89,7 @@ export function FarmingCalendar({
           </span>
           {totalCombined > 0 && (
             <span className="text-[#c8a84b] text-[10px] font-medium">
-              {formatKoreanAmount(totalCombined)} 총수입
+              {formatKoreanCurrency(totalCombined)} 총수입
             </span>
           )}
           {isDummy && (
@@ -131,7 +122,7 @@ export function FarmingCalendar({
             },
             {
               label: "메소",
-              value: formatKoreanAmount(totalMeso),
+              value: formatKoreanCurrency(totalMeso),
               color: "text-[#60c8a0]",
             },
             {
@@ -256,7 +247,12 @@ export function FarmingCalendar({
                   </div>
                   <div className="mt-1">
                     <span className="text-[8px] font-extrabold text-[#f6d34d]">
-                      {formatKoreanAmount(log!.meso)}
+                      {formatKoreanCurrency(log!.meso)}
+                    </span>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-[8px] font-extrabold text-[#f6d34d]">
+                      {formatKoreanCurrency(log!.total)}
                     </span>
                   </div>
                 </div>

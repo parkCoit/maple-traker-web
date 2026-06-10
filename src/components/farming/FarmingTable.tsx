@@ -1,20 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import type { FarmingLog } from "@/types/farming";
 import { getFarmingLogs } from "@/api/user";
+import { formatKoreanCurrency } from "@/utils/format";
 type Props = {
   logs: FarmingLog[];
   nickname?: string;
 };
 const PER_PAGE = 5;
-function formatValue(value: number): string {
-  if (value >= 10000) {
-    const eok = Math.floor(value / 10000);
-    const man = Math.floor(value % 10000);
-    if (man > 0) return `${eok}억${man}만원`;
-    return `${eok}억`;
-  }
-  return `${value}만원`;
-}
 
 export function FarmingTable({ logs, nickname }: Props) {
   const [page, setPage] = useState(1);
@@ -48,14 +40,27 @@ export function FarmingTable({ logs, nickname }: Props) {
       try {
         const data = await getFarmingLogs(nickname);
         if (!mounted) return;
-        const mapped = (data || []).map((log: any) => ({
-          date: normalize(log.date),
-          stuff: log.stuff ?? 0,
-          meso: log.meso_man ?? log.meso ?? 0,
-          frags: log.frags ?? 0,
-          gems: log.gems ?? 0,
-          total: log.total_meso ?? log.total ?? 0,
-        }));
+        const payload = data?.farming ?? data ?? [];
+        const mapped = (payload || []).map((log: any) => {
+          const manToRaw = (v: number | undefined | null) => (v ?? 0) * 10000;
+          const mesoRaw = log.meso ?? manToRaw(log.meso_man);
+          const totalRaw =
+            log.total_meso ??
+            manToRaw(
+              (log.meso_man ?? 0) +
+                (log.frags ?? 0) * (log.f_price ?? 0) +
+                (log.gems ?? 0) * (log.g_price ?? 0),
+            );
+
+          return {
+            date: normalize(log.date),
+            stuff: log.stuff ?? 0,
+            meso: mesoRaw,
+            frags: log.frags ?? 0,
+            gems: log.gems ?? 0,
+            total: totalRaw,
+          };
+        });
         setFetchedLogs(mapped);
         setPage(1);
       } catch (err) {
@@ -161,7 +166,7 @@ export function FarmingTable({ logs, nickname }: Props) {
                     </span>
                   </div>
                   <span className="text-[#60c8a0] text-xs text-right self-center">
-                    {formatValue(log.meso)}
+                    {formatKoreanCurrency(log.meso)}
                   </span>
                   <span className="text-[#c0c0d8] text-xs text-right self-center">
                     {log.frags}개
@@ -170,7 +175,7 @@ export function FarmingTable({ logs, nickname }: Props) {
                     {log.gems}개
                   </span>
                   <span className="text-[#c8a84b] text-xs font-semibold text-right self-center">
-                    {log.total}
+                    {formatKoreanCurrency(log.total)}
                   </span>
                 </div>
               );
