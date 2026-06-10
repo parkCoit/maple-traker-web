@@ -1,10 +1,9 @@
 import axios from "axios";
-import { VITE_API_BASE_URL } from "@/secret.json";
 
 // const API_BASE_URL = "http://localhost:8000";
 
 const api = axios.create({
-  baseURL: VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
