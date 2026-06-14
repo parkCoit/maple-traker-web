@@ -123,10 +123,10 @@ export function Farming() {
       date: log.date,
       stuff: log.stuff,
       // convert server 'man' units to raw meso
-      meso: (log.meso_man ?? log.meso ?? 0) * 10000,
+      meso: log.meso_man ?? log.meso ?? 0,
       frags: log.frags,
       gems: log.gems,
-      total: (log.total_meso ?? log.total ?? 0) * 10000,
+      total: log.total_meso ?? log.total ?? 0,
     }));
   }, [userData]);
 

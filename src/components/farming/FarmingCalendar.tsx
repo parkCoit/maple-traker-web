@@ -13,7 +13,6 @@ type Props = {
   startOffset: number;
 };
 function getTier(stuff: number) {
-  // 티어 기준을 '소재(stuff)' 기준으로 변경
   if (stuff >= 10)
     return {
       label: "레전",
@@ -67,6 +66,7 @@ export function FarmingCalendar({
     (a, d) => a + (d.log?.total ?? d.log?.meso ?? 0),
     0,
   );
+  console.log(totalMeso, huntDays);
   const avgStuff = huntDays > 0 ? totalStuff / huntDays : 0;
   const gradeInfo = getGradeInfo(Math.floor(avgStuff));
   const monthPhrase = gradeInfo.phrase;

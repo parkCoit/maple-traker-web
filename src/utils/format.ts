@@ -4,9 +4,9 @@ export function formatKoreanCurrency(value: number): string {
     const eok = Math.floor(num / 10000);
     const man = num % 10000;
     if (man === 0) return `${eok}억`;
-    return `${eok}억 ${man.toLocaleString()}만`;
+    return `${eok}억 ${man.toLocaleString()}만원`;
   }
-  return num > 0 ? num.toLocaleString() : "0";
+  return num > 0 ? `${num.toLocaleString()}만원` : "0";
 }
 
 export function getWeekOfMonth(dt: Date): number {
